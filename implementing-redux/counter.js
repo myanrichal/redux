@@ -60,4 +60,6 @@ const { createStore } = Dedux
     });
 
     // Run this to initialize the state 
-    store.dispatch({})
+    store.dispatch({
+        type: 'INIT' 
+    }); 
