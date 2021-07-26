@@ -3,10 +3,14 @@ export default {
   applyMiddleware,
 }
 
-function createStore (reducer, initialState) {
+function createStore(reducer, initialState) {
+
+  if( typeof reducer !== 'function' ){
+    throw 'Create Store does not include valid Reducer'; 
+  }
 
   const store = {
-    state: initialState,
+    state: initialState || reducer(),
     listeners: [], 
     getState: () => store.state, 
     subscribe: (listener) => {

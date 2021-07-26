@@ -2,13 +2,7 @@ import Dedux from './dedux.js'
 const { createStore } = Dedux
 
 
-    const initialState = {
-        count: 0
-    }
-
-    document.getElementById('count').innerHTML = initialState.count
-
-    const reducer = (previousState, action) => {
+    const reducer = (previousState = {count: 0}, action = {type: 'INIT'}) => {
         switch (action.type) {
             case 'INCREMENT':
                 return {
@@ -28,10 +22,16 @@ const { createStore } = Dedux
     };
 
     // Creates a dedux store
-    const store = createStore(reducer, initialState); 
+    const store = createStore(reducer); 
 
-    // listen for state change. update HTML when changed
+    // Run this to initialize the state 
+    store.dispatch({
+        type: 'INIT' 
+    }); 
+
+    // listen for state change. update HTML when changed; initalize value as well
     const counter = document.getElementById('count');
+    counter.innerHTML = store.getState().count
     store.subscribe(() => {
         const state = store.getState();
         const count = state.count;
@@ -53,13 +53,13 @@ const { createStore } = Dedux
     });
 
     // Dispatch reset
+    // document.getElementById('reset').addEventListener('click', () => {
+    //     store.dispatch({
+    //         type: 'RESET'
+    //     });
+    // });
+
     document.getElementById('reset').addEventListener('click', () => {
-        store.dispatch({
-            type: 'RESET'
-        });
+        console.log("getSTate: ", store.getState().foo); 
     });
 
-    // Run this to initialize the state 
-    store.dispatch({
-        type: 'INIT' 
-    }); 
