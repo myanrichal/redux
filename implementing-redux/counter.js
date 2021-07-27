@@ -33,9 +33,7 @@ const { createStore } = Dedux
     const counter = document.getElementById('count');
     counter.innerHTML = store.getState().count
     store.subscribe(() => {
-        const state = store.getState();
-        const count = state.count;
-        counter.innerHTML = count;
+        counter.innerHTML = store.getState().count;
     });
 
     // Dispatch increment
@@ -53,13 +51,8 @@ const { createStore } = Dedux
     });
 
     // Dispatch reset
-    // document.getElementById('reset').addEventListener('click', () => {
-    //     store.dispatch({
-    //         type: 'RESET'
-    //     });
-    // });
-
     document.getElementById('reset').addEventListener('click', () => {
-        console.log("getSTate: ", store.getState().foo); 
+        store.dispatch({
+            type: 'RESET'
+        });
     });
-

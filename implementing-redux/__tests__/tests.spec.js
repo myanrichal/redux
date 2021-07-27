@@ -1,6 +1,14 @@
 import Dedux from '../dedux'
 const { createStore, applyMiddleware } = Dedux
 
+//jest doesn't play well with localStorage. Lets mock one like this. Thanks Stackoverflow. 
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  clear: jest.fn()
+};
+global.localStorage = localStorageMock;
+
 /*======================================================
                           TESTS
 ======================================================*/
@@ -38,7 +46,16 @@ describe('dedux', () => {
 
       it(`dispatch should take any dispatched action and run it 
           through the reducer function to produce a new state.`, () => {
-        const reducer = () => {} // Your reducer function here!
+        const reducer = (previousState = {foo: 'bar'}, action = {type: 'INIT'}) => {
+          switch (action.type) {
+            case 'BAZIFY':
+                return {
+                    foo: 'baz' 
+                };
+            default:
+                return previousState;
+          }
+        } 
 
         const store = createStore(reducer)
 

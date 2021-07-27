@@ -3,6 +3,7 @@ export default {
   applyMiddleware,
 }
 
+
 function createStore(reducer, initialState) {
 
   if( typeof reducer !== 'function' ){
@@ -17,9 +18,13 @@ function createStore(reducer, initialState) {
       store.listeners.push(listener); 
     }, 
     dispatch: (action) => {
-      store.state = reducer(store.state, action); 
-      store.state = applyMiddleware(store.state, action);  
-      store.listeners.forEach((listener) => listener()); 
+      if( action.hasOwnProperty('type') ) {
+        store.state = reducer(store.state, action); 
+        store.state = applyMiddleware(store.state, action);  
+        store.listeners.forEach((listener) => listener()); 
+      } else {
+        throw 'Action requires `type`'
+      }
     }
   }; 
 
@@ -30,29 +35,15 @@ function applyMiddleware(state, action) {
   return checkLocalStorage(state, action); 
 }
 
+
 function checkLocalStorage(state, action) {
-  let localCount = "count"
+  let key = 'store'
   if(action.type === 'INIT') {
-    if(localStorage.getItem(localCount) !== null) {
-      state = { count: parseInt(localStorage.getItem(localCount)) }; 
+    if(localStorage.getItem(key) !== null) {
+      state = JSON.parse( localStorage.getItem(key) ); 
     }
   } else {
-    localStorage.setItem(localCount, state.count); 
+    localStorage.setItem(key, JSON.stringify(state) ); 
   }
   return state
 }
-
-
-
-/*
- if(action.type === 'INIT' && (localStorage.getItem("count") !== null) ) {
-    let initCount = localStorage.getItem("count")
-    return { 
-      count : initCount, 
-    }; 
-  }
-  
-  localStorage.setItem("count", state.count); 
-  return state
-  */
-
