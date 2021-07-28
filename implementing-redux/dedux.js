@@ -1,6 +1,7 @@
 export default {
   createStore,
-  applyMiddleware,
+  // applyMiddleware,
+  dumbMiddleware,
 }
 
 
@@ -17,6 +18,7 @@ function createStore(reducer, initialState) {
     subscribe: (listener) => {
       let index = store.listeners.push(listener); 
       return () => {
+        //unsubscribe
         store.listeners.splice(index-1, 1)
       }
 
@@ -24,7 +26,7 @@ function createStore(reducer, initialState) {
     dispatch: (action) => {
       if( action.hasOwnProperty('type') ) {
         store.state = reducer(store.state, action); 
-        store.state = applyMiddleware(store.state, action);  
+        store.state = dumbMiddleware(store.state, action);  
         store.listeners.forEach((listener) => listener(store.state)); 
       } else {
         throw 'Action requires `type`'
@@ -35,11 +37,7 @@ function createStore(reducer, initialState) {
   return store;
 }
 
-// function unsubscribe(listener) {
-//   console.log("listener: ", listener); 
-// }
-
-function applyMiddleware(state, action) {
+function dumbMiddleware(state, action) {
   return checkLocalStorage(state, action); 
 }
 

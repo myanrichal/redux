@@ -1,13 +1,19 @@
 import Dedux from '../dedux'
 const { createStore, applyMiddleware } = Dedux
 
-//jest doesn't play well with localStorage. Lets mock one like this. Thanks Stackoverflow. 
+//jest doesn't play well 
 const localStorageMock = {
   getItem: jest.fn(),
   setItem: jest.fn(),
   clear: jest.fn()
 };
 global.localStorage = localStorageMock;
+
+const JSONMock = {
+  parse: jest.fn(), 
+  stringify: jest.fn()
+}
+global.JSON = JSONMock
 
 /*======================================================
                           TESTS
@@ -140,4 +146,43 @@ describe('dedux', () => {
       expect(spyB).toHaveBeenCalledWith(action)
     })
   })
+})
+
+describe('counter', () => {
+  const reducer = (previousState = {count: 0}, action = {type: 'INIT'}) => {
+    switch (action.type) {
+        case 'INCREMENT':
+            return {
+                count: previousState.count + 1,
+            };
+        case 'DECREMENT':
+            return {
+                count: previousState.count - 1,
+            };
+        case 'RESET': 
+            return {
+                count: previousState.count = 0, 
+            }
+        default:
+            return previousState;
+    }
+  };
+  
+  const store = createStore(reducer)
+
+  it('increments when INCREMENT is dispatched', () => {
+    store.dispatch({ type: 'INCREMENT' })
+    expect(store.getState().count).toBe(1)
+  })
+
+  it('resets when RESET is dispatched', () => {
+    store.dispatch({ type: 'RESET' })
+    expect(store.getState().count).toBe(0)
+  })
+
+  it('decrements when DECREMENT is dispatched', () => {
+    store.dispatch({ type: 'DECREMENT' })
+    expect(store.getState().count).toBe(-1)
+  })
+
 })
