@@ -15,7 +15,7 @@ const { createStore, applyMiddleware } = Dedux
             case 'RESET': 
                 return {
                     count: previousState.count = 0, 
-                }
+                }; 
             default:
                 return previousState;
         }
@@ -23,6 +23,19 @@ const { createStore, applyMiddleware } = Dedux
 
     // Creates a dedux store
     const store = createStore(reducer); 
+
+    // create and apply middleWare
+    const logging = store => next => action => {
+        console.log("Logging action here: ", action.type); 
+        next(action); 
+    }
+
+    const localStorageMiddleware = store => next => action => {
+        next(action);   //reducer needs to run before we check local
+        store.state = checkLocalStorage(store.state, action); 
+    }
+    
+    applyMiddleware(store, [logging, localStorageMiddleware]); 
 
     // Run this to initialize the state 
     store.dispatch({
@@ -51,53 +64,21 @@ const { createStore, applyMiddleware } = Dedux
     });
 
     // Dispatch reset
-    // document.getElementById('reset').addEventListener('click', () => {
-    //     store.dispatch({
-    //         type: 'RESET'
-    //     });
-    // });
-
     document.getElementById('reset').addEventListener('click', () => {
-        const logging = storeAPI => next => action => {
-            console.log("Logging action here: ", action.type); 
-            next(action); 
-            return "done";  
+        store.dispatch({
+            type: 'RESET'
+        });
+    });
+
+    //helper function for reducer
+    function checkLocalStorage(state, action) {
+        let key = 'store'
+        if(action.type === 'INIT') {
+          if(localStorage.getItem(key) !== null) {
+            state = JSON.parse( localStorage.getItem(key) ); 
+          }
+        } else {
+          localStorage.setItem(key, JSON.stringify(state) ); 
         }
-
-        const blogging = function(storeAPI) {
-            return function(next) {
-                return function(action) {
-                    console.log("blogging "); 
-                    next(action); 
-                    return "done"; 
-                }
-            }
-        }
-
-        const asdf = function(storeAPI) {
-            return function(next) {
-                return function(action) {
-                    console.log("asdf "); 
-                    next(action); 
-                    return "done"; 
-                }
-            }
-        }
-
-        const frogging = function(storeAPI) {
-            return function(next) {
-                return function(action) {
-                    console.log("ribbet "); 
-                    next(action); 
-                    return "whatever"; 
-                }
-            }
-        }
-        
-        applyMiddleware(store, [logging, blogging, asdf, frogging]); 
-    })
-
-    // const logging = storeAPI => next => action {
-    //     console.log("logging!"); 
-
-    //   }
+        return state
+    }
