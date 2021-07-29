@@ -1,5 +1,5 @@
 import Dedux from './dedux.js'
-const { createStore } = Dedux
+const { createStore, applyMiddleware } = Dedux
 
 
     const reducer = (previousState = {count: 0}, action = {type: 'INIT'}) => {
@@ -51,8 +51,53 @@ const { createStore } = Dedux
     });
 
     // Dispatch reset
+    // document.getElementById('reset').addEventListener('click', () => {
+    //     store.dispatch({
+    //         type: 'RESET'
+    //     });
+    // });
+
     document.getElementById('reset').addEventListener('click', () => {
-        store.dispatch({
-            type: 'RESET'
-        });
-    });
+        const logging = storeAPI => next => action => {
+            console.log("Logging action here: ", action.type); 
+            next(action); 
+            return "done";  
+        }
+
+        const blogging = function(storeAPI) {
+            return function(next) {
+                return function(action) {
+                    console.log("blogging "); 
+                    next(action); 
+                    return "done"; 
+                }
+            }
+        }
+
+        const asdf = function(storeAPI) {
+            return function(next) {
+                return function(action) {
+                    console.log("asdf "); 
+                    next(action); 
+                    return "done"; 
+                }
+            }
+        }
+
+        const frogging = function(storeAPI) {
+            return function(next) {
+                return function(action) {
+                    console.log("ribbet "); 
+                    next(action); 
+                    return "whatever"; 
+                }
+            }
+        }
+        
+        applyMiddleware(store, [logging, blogging, asdf, frogging]); 
+    })
+
+    // const logging = storeAPI => next => action {
+    //     console.log("logging!"); 
+
+    //   }
